@@ -120,19 +120,19 @@
     label, p.desc {
       color: #cbd5e1;
       font-size: 0.95rem;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       display: block;
     }
 
     input, textarea {
       width: 100%;
-      padding: 14px 16px;
-      margin: 8px 0 15px 0;
+      padding: 12px 14px;
+      margin: 4px 0 12px 0;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       background: var(--input-bg);
       color: #0f172a;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 500;
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
       transition: all 0.2s;
@@ -187,12 +187,12 @@
       font-size: 1.1rem;
     }
 
-    .member-item {
+    .member-item, .wish-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: rgba(255, 255, 255, 0.12);
-      padding: 12px 16px;
+      padding: 10px 14px;
       margin: 8px 0;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
@@ -205,26 +205,34 @@
       color: var(--gold-glow);
     }
 
+    .wish-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #3b82f6;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.2s;
+    }
+
+    .wish-link-btn:hover {
+      background: #2563eb;
+    }
+
     hr {
       border: 0;
       height: 1px;
       background: rgba(255, 255, 255, 0.15);
       margin: 20px 0;
     }
-
-    .link-btn {
-      display: inline-block;
-      background: #3b82f6;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-      margin: 4px 4px 4px 0;
-      font-size: 0.9rem;
-      transition: background 0.2s;
-    }
-    .link-btn:hover { background: #2563eb; }
   </style>
 
   <!-- Firebase SDKs -->
@@ -260,35 +268,35 @@
     <div id="user-dashboard" style="display:none;">
       <h2 id="welcome-msg" style="text-align:center; color: var(--gold-glow); margin-top:0;"></h2>
       
-      <!-- CIBLE & SA LISTE -->
+      <!-- CIBLE & SA LISTE DE SOUHAITS -->
       <div class="card" style="border-color: rgba(239, 68, 68, 0.5);">
         <h3>🎯 Tu dois offrir un cadeau à :</h3>
         <h2 id="target-name" style="color: #ffffff; margin: 10px 0; font-size: 2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3);">...</h2>
         
         <hr>
         
-        <h3 style="color: var(--gold-glow); margin-bottom: 5px;">💡 Idées de cadeaux</h3>
-        <p id="target-wishlist-text" style="color: #cbd5e1; white-space: pre-wrap; margin: 0 0 10px 0;">-</p>
-
-        <h3 style="color: var(--gold-glow); margin-bottom: 5px;">🔗 Liens des cadeaux</h3>
-        <div id="target-wishlist-links" style="margin-top: 5px;">
-          <span style="color: #cbd5e1; font-style: italic;">Aucun lien fourni.</span>
+        <h3 style="color: var(--gold-glow); margin-bottom: 8px;">💡 Liste de souhaits de ta cible</h3>
+        <div id="target-wishlist-items">
+          <p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucune idée enregistrée pour l'instant.</p>
         </div>
       </div>
 
-      <!-- TA PROPRE LISTE -->
+      <!-- PROPRE LISTE DE SOUHAITS -->
       <div class="card">
-        <h3>📝 Ma liste de souhaits personnelle</h3>
+        <h3>📝 Ma liste de souhaits</h3>
         
-        <label style="font-size:0.9rem; margin:0;">Idées / Description :</label>
-        <textarea id="my-wishlist" rows="3" placeholder="Écris tes idées cadeaux ici..."></textarea>
-        
-        <label style="font-size:0.9rem; margin:0;">Liens web (séparés par des espaces ou des retours à la ligne) :</label>
-        <textarea id="my-links" rows="2" placeholder="Colle tes liens de produits ici (ex: https://... https://...)"></textarea>
+        <label>Ajouter une idée cadeau :</label>
+        <input type="text" id="item-name" placeholder="Nom du cadeau (ex: Casque audio, Livre...)">
+        <input type="url" id="item-link" placeholder="Lien web / URL (ex: https://...)" onkeydown="checkWishEnter(event)">
 
-        <button class="btn-primary" onclick="saveWishlist()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); margin-top: 10px;">
-          Enregistrer ma liste ✨
+        <button class="btn-primary" onclick="addWishItem()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); margin-bottom: 15px;">
+          Ajouter à ma liste ➕
         </button>
+
+        <h4 style="color: var(--gold-glow); margin: 15px 0 8px 0;">Mes articles enregistrés :</h4>
+        <div id="my-wishlist-items">
+          <p style="color: #cbd5e1; font-style: italic; margin: 0;">Votre liste est vide.</p>
+        </div>
       </div>
       
       <button class="btn-primary btn-danger" onclick="logout()" style="margin-top:20px;">Se déconnecter</button>
@@ -357,6 +365,7 @@
   function checkUserEnter(e) { if (e.key === 'Enter') loginUser(); }
   function checkAdminEnter(e) { if (e.key === 'Enter') loginAdmin(); }
   function checkMemberEnter(e) { if (e.key === 'Enter') addMember(); }
+  function checkWishEnter(e) { if (e.key === 'Enter') addWishItem(); }
 
   function loginUser() {
     const pin = document.getElementById('pin-input').value.trim();
@@ -378,47 +387,98 @@
     if (!freshData) { logout(); return; }
     
     document.getElementById('welcome-msg').innerText = `Bonjour ${freshData.name} ! 🎄`;
-    document.getElementById('my-wishlist').value = freshData.wishlist || '';
-    document.getElementById('my-links').value = freshData.links || '';
 
+    // 1. Rendu de MA propre liste
+    renderMyWishlist(freshData.items || {});
+
+    // 2. Rendu de la liste de MA CIBLE
     const targetId = allData.assignments ? allData.assignments[currentUser.id] : null;
     if (targetId && allData.members[targetId]) {
       const target = allData.members[targetId];
       document.getElementById('target-name').innerText = target.name;
-      document.getElementById('target-wishlist-text').innerText = target.wishlist || "N'a encore rien écrit.";
-      
-      // Transformation intelligente des liens en beaux boutons cliquables
-      const linksContainer = document.getElementById('target-wishlist-links');
-      if (target.links && target.links.trim() !== '') {
-        const rawLinks = target.links.split(/[\s\n]+/); // Sépare par espaces ou retours à la ligne
-        let linksHtml = '';
-        let count = 1;
-        rawLinks.forEach(link => {
-          if (link.startsWith('http://') || link.startsWith('https://')) {
-            linksHtml += `<a href="${link}" target="_blank" class="link-btn">🔗 Ouvrir le lien ${count}</a> `;
-            count++;
-          }
-        });
-        linksContainer.innerHTML = linksHtml !== '' ? linksHtml : '<span style="color: #cbd5e1; font-style: italic;">Aucun lien valide.</span>';
-      } else {
-        linksContainer.innerHTML = '<span style="color: #cbd5e1; font-style: italic;">Aucun lien fourni.</span>';
-      }
-
+      renderTargetWishlist(target.items || {});
     } else {
       document.getElementById('target-name').innerText = "Le tirage n'a pas encore eu lieu !";
-      document.getElementById('target-wishlist-text').innerText = "-";
-      document.getElementById('target-wishlist-links').innerHTML = '-';
+      document.getElementById('target-wishlist-items').innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">-</p>';
     }
   }
 
-  function saveWishlist() {
+  function addWishItem() {
     if (!currentUser) return;
-    const wishlistText = document.getElementById('my-wishlist').value;
-    const linksText = document.getElementById('my-links').value;
-    
-    db.ref('members/' + currentUser.id + '/wishlist').set(wishlistText);
-    db.ref('members/' + currentUser.id + '/links').set(linksText);
-    alert("Liste et liens enregistrés avec succès !");
+    const nameInput = document.getElementById('item-name');
+    const linkInput = document.getElementById('item-link');
+    const name = nameInput.value.trim();
+    let link = linkInput.value.trim();
+
+    if (!name) {
+      alert("Veuillez entrer le nom du cadeau.");
+      return;
+    }
+
+    if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+      link = 'https://' + link;
+    }
+
+    db.ref('members/' + currentUser.id + '/items').push({
+      name: name,
+      link: link
+    });
+
+    nameInput.value = '';
+    linkInput.value = '';
+    nameInput.focus();
+  }
+
+  function removeWishItem(itemId) {
+    if (!currentUser) return;
+    db.ref('members/' + currentUser.id + '/items/' + itemId).remove();
+  }
+
+  function renderMyWishlist(items) {
+    const container = document.getElementById('my-wishlist-items');
+    const keys = Object.keys(items);
+    if (keys.length === 0) {
+      container.innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">Votre liste est vide.</p>';
+      return;
+    }
+
+    let html = '';
+    keys.forEach(id => {
+      const item = items[id];
+      html += `
+        <div class="wish-item">
+          <div>
+            <strong style="color:#fff;">${item.name}</strong>
+            ${item.link ? `<br><a href="${item.link}" target="_blank" class="wish-link-btn" style="margin-top:4px;">🔗 Voir le lien</a>` : ''}
+          </div>
+          <button onclick="removeWishItem('${id}')" class="btn-primary btn-danger" style="width:auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-radius:6px;">Supprimer</button>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function renderTargetWishlist(items) {
+    const container = document.getElementById('target-wishlist-items');
+    const keys = Object.keys(items);
+    if (keys.length === 0) {
+      container.innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucune idée enregistrée pour l\'instant.</p>';
+      return;
+    }
+
+    let html = '';
+    keys.forEach(id => {
+      const item = items[id];
+      html += `
+        <div class="wish-item">
+          <div>
+            <strong style="color:#fff; font-size: 1.05rem;">🎁 ${item.name}</strong>
+          </div>
+          ${item.link ? `<a href="${item.link}" target="_blank" class="wish-link-btn">🔗 Ouvrir le lien</a>` : '<span style="color:#94a3b8; font-size:0.85rem;">(Pas de lien)</span>'}
+        </div>
+      `;
+    });
+    container.innerHTML = html;
   }
 
   function logout() {
@@ -452,7 +512,7 @@
 
     const pin = Math.floor(1000 + Math.random() * 9000);
     const newRef = db.ref('members').push();
-    newRef.set({ name: name, pin: pin, wishlist: '', links: '' });
+    newRef.set({ name: name, pin: pin, items: {} });
     nameInput.value = '';
     nameInput.focus();
   }
