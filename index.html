@@ -7,7 +7,7 @@
   <style>
     :root {
       --gold-glow: #ffea79;
-      --card-bg: rgba(20, 16, 45, 0.75);
+      --card-bg: rgba(20, 16, 45, 0.88);
       --input-bg: rgba(255, 255, 255, 0.95);
       --primary-blue: #3b82f6;
       --primary-green: #10b981;
@@ -24,19 +24,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #0f0a2a url('https://images.unsplash.com/photo-1543589077-47d51b39653f?q=80&w=1920') no-repeat center center fixed;
-      background-size: cover;
+      /* Fond de Noël étoilé en CSS pur */
+      background: 
+        radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 230px 80px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 300px 150px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f0a2a 60%, #05030f 100%);
+      background-repeat: repeat;
+      background-size: 350px 350px, 400px 400px, 250px 250px, 300px 300px, 320px 320px, 380px 380px, 100% 100%;
       color: #ffffff;
-      position: relative;
-    }
-
-    /* Effet d'ombrage sombre sur le fond */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle, rgba(15, 10, 42, 0.4) 0%, rgba(5, 3, 15, 0.85) 100%);
-      z-index: 0;
     }
 
     .container {
@@ -49,11 +48,10 @@
       -webkit-backdrop-filter: blur(12px);
       border-radius: 20px;
       padding: 35px 30px;
-      box-shadow: 0 0 30px rgba(255, 234, 121, 0.25), 0 20px 50px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 35px rgba(255, 234, 121, 0.25), 0 20px 50px rgba(0, 0, 0, 0.7);
       border: 2px solid rgba(255, 234, 121, 0.5);
     }
 
-    /* En-tête / Logo */
     .header-logo {
       text-align: center;
       margin-bottom: 25px;
@@ -68,7 +66,7 @@
 
     .header-logo h2 {
       margin: 5px 0 0 0;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       letter-spacing: 3px;
       font-weight: 300;
       text-transform: uppercase;
@@ -84,12 +82,11 @@
       text-shadow: 0 0 12px rgba(255,255,255,0.5);
     }
 
-    /* Onglets Nav */
     .tabs {
       display: flex;
       gap: 12px;
       margin-bottom: 25px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.4);
       padding: 6px;
       border-radius: 12px;
     }
@@ -121,7 +118,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Formulaires & Inputs */
     label, p.desc {
       color: #cbd5e1;
       font-size: 0.95rem;
@@ -149,7 +145,6 @@
       box-shadow: 0 0 10px rgba(255, 234, 121, 0.5);
     }
 
-    /* Boutons stylisés */
     button.btn-primary {
       width: 100%;
       padding: 14px;
@@ -179,7 +174,6 @@
       box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
     }
 
-    /* Cards internes */
     .card {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
