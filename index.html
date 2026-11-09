@@ -24,7 +24,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      /* Fond de Noël étoilé en CSS pur */
       background: 
         radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
         radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
@@ -128,7 +127,7 @@
     input, textarea {
       width: 100%;
       padding: 14px 16px;
-      margin: 10px 0 18px 0;
+      margin: 8px 0 15px 0;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       background: var(--input-bg);
@@ -210,8 +209,22 @@
       border: 0;
       height: 1px;
       background: rgba(255, 255, 255, 0.15);
-      margin: 25px 0;
+      margin: 20px 0;
     }
+
+    .link-btn {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 4px 4px 4px 0;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .link-btn:hover { background: #2563eb; }
   </style>
 
   <!-- Firebase SDKs -->
@@ -247,22 +260,33 @@
     <div id="user-dashboard" style="display:none;">
       <h2 id="welcome-msg" style="text-align:center; color: var(--gold-glow); margin-top:0;"></h2>
       
-      <!-- CIBLE & SA LISTE DE SOUHAITS RÉUNIS EN HAUT -->
+      <!-- CIBLE & SA LISTE -->
       <div class="card" style="border-color: rgba(239, 68, 68, 0.5);">
         <h3>🎯 Tu dois offrir un cadeau à :</h3>
         <h2 id="target-name" style="color: #ffffff; margin: 10px 0; font-size: 2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3);">...</h2>
         
-        <hr style="border: 0; height: 1px; background: rgba(255, 255, 255, 0.15); margin: 15px 0;">
+        <hr>
         
-        <h3 style="color: var(--gold-glow); margin-bottom: 8px;">💡 Idées cadeaux / Liste de souhaits de ta cible</h3>
-        <p id="target-wishlist" style="color: #cbd5e1; font-style: italic; margin: 0;">Aucune idée enregistrée pour l'instant.</p>
+        <h3 style="color: var(--gold-glow); margin-bottom: 5px;">💡 Idées de cadeaux</h3>
+        <p id="target-wishlist-text" style="color: #cbd5e1; white-space: pre-wrap; margin: 0 0 10px 0;">-</p>
+
+        <h3 style="color: var(--gold-glow); margin-bottom: 5px;">🔗 Liens des cadeaux</h3>
+        <div id="target-wishlist-links" style="margin-top: 5px;">
+          <span style="color: #cbd5e1; font-style: italic;">Aucun lien fourni.</span>
+        </div>
       </div>
 
-      <!-- TA PROPRE LISTE DE SOUHAITS PLUS BAS -->
+      <!-- TA PROPRE LISTE -->
       <div class="card">
         <h3>📝 Ma liste de souhaits personnelle</h3>
+        
+        <label style="font-size:0.9rem; margin:0;">Idées / Description :</label>
         <textarea id="my-wishlist" rows="3" placeholder="Écris tes idées cadeaux ici..."></textarea>
-        <button class="btn-primary" onclick="saveWishlist()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+        
+        <label style="font-size:0.9rem; margin:0;">Liens web (séparés par des espaces ou des retours à la ligne) :</label>
+        <textarea id="my-links" rows="2" placeholder="Colle tes liens de produits ici (ex: https://... https://...)"></textarea>
+
+        <button class="btn-primary" onclick="saveWishlist()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); margin-top: 10px;">
           Enregistrer ma liste ✨
         </button>
       </div>
@@ -300,7 +324,6 @@
 </div>
 
 <script>
-  // Configuration Firebase
   const firebaseConfig = {
     databaseURL: "https://noel-famille-86a66-default-rtdb.firebaseio.com"
   };
@@ -310,7 +333,6 @@
   let currentUser = null;
   let allData = { members: {}, assignments: {} };
 
-  // Synchronisation Firebase en temps réel
   db.ref().on('value', (snapshot) => {
     allData = snapshot.val() || { members: {}, assignments: {} };
     if (!allData.members) allData.members = {};
@@ -332,12 +354,10 @@
     }
   }
 
-  // Raccourcis Touche Entrée
   function checkUserEnter(e) { if (e.key === 'Enter') loginUser(); }
   function checkAdminEnter(e) { if (e.key === 'Enter') loginAdmin(); }
   function checkMemberEnter(e) { if (e.key === 'Enter') addMember(); }
 
-  // Connexion Participant
   function loginUser() {
     const pin = document.getElementById('pin-input').value.trim();
     const memberKey = Object.keys(allData.members).find(k => allData.members[k].pin == pin);
@@ -359,23 +379,46 @@
     
     document.getElementById('welcome-msg').innerText = `Bonjour ${freshData.name} ! 🎄`;
     document.getElementById('my-wishlist').value = freshData.wishlist || '';
+    document.getElementById('my-links').value = freshData.links || '';
 
     const targetId = allData.assignments ? allData.assignments[currentUser.id] : null;
     if (targetId && allData.members[targetId]) {
       const target = allData.members[targetId];
       document.getElementById('target-name').innerText = target.name;
-      document.getElementById('target-wishlist').innerText = target.wishlist || "N'a encore rien inscrit pour l'instant.";
+      document.getElementById('target-wishlist-text').innerText = target.wishlist || "N'a encore rien écrit.";
+      
+      // Transformation intelligente des liens en beaux boutons cliquables
+      const linksContainer = document.getElementById('target-wishlist-links');
+      if (target.links && target.links.trim() !== '') {
+        const rawLinks = target.links.split(/[\s\n]+/); // Sépare par espaces ou retours à la ligne
+        let linksHtml = '';
+        let count = 1;
+        rawLinks.forEach(link => {
+          if (link.startsWith('http://') || link.startsWith('https://')) {
+            linksHtml += `<a href="${link}" target="_blank" class="link-btn">🔗 Ouvrir le lien ${count}</a> `;
+            count++;
+          }
+        });
+        linksContainer.innerHTML = linksHtml !== '' ? linksHtml : '<span style="color: #cbd5e1; font-style: italic;">Aucun lien valide.</span>';
+      } else {
+        linksContainer.innerHTML = '<span style="color: #cbd5e1; font-style: italic;">Aucun lien fourni.</span>';
+      }
+
     } else {
       document.getElementById('target-name').innerText = "Le tirage n'a pas encore eu lieu !";
-      document.getElementById('target-wishlist').innerText = "-";
+      document.getElementById('target-wishlist-text').innerText = "-";
+      document.getElementById('target-wishlist-links').innerHTML = '-';
     }
   }
 
   function saveWishlist() {
     if (!currentUser) return;
-    const text = document.getElementById('my-wishlist').value;
-    db.ref('members/' + currentUser.id + '/wishlist').set(text);
-    alert("Liste de souhaits enregistrée avec succès !");
+    const wishlistText = document.getElementById('my-wishlist').value;
+    const linksText = document.getElementById('my-links').value;
+    
+    db.ref('members/' + currentUser.id + '/wishlist').set(wishlistText);
+    db.ref('members/' + currentUser.id + '/links').set(linksText);
+    alert("Liste et liens enregistrés avec succès !");
   }
 
   function logout() {
@@ -385,7 +428,6 @@
     document.getElementById('pin-input').value = '';
   }
 
-  // Connexion & Actions Admin
   function loginAdmin() {
     const pin = document.getElementById('admin-pin').value.trim();
     if (pin === '999' || pin === '9999') {
@@ -410,7 +452,7 @@
 
     const pin = Math.floor(1000 + Math.random() * 9000);
     const newRef = db.ref('members').push();
-    newRef.set({ name: name, pin: pin, wishlist: '' });
+    newRef.set({ name: name, pin: pin, wishlist: '', links: '' });
     nameInput.value = '';
     nameInput.focus();
   }
@@ -480,7 +522,7 @@
     }
 
     db.ref('assignments').set(result);
-    alert("🎉 Le tirage au sort au été effectué avec succès !");
+    alert("🎉 Le tirage au sort a été effectué avec succès !");
   }
 </script>
 
