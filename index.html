@@ -247,22 +247,24 @@
     <div id="user-dashboard" style="display:none;">
       <h2 id="welcome-msg" style="text-align:center; color: var(--gold-glow); margin-top:0;"></h2>
       
+      <!-- CIBLE & SA LISTE DE SOUHAITS RÉUNIS EN HAUT -->
       <div class="card" style="border-color: rgba(239, 68, 68, 0.5);">
         <h3>🎯 Tu dois offrir un cadeau à :</h3>
         <h2 id="target-name" style="color: #ffffff; margin: 10px 0; font-size: 2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3);">...</h2>
+        
+        <hr style="border: 0; height: 1px; background: rgba(255, 255, 255, 0.15); margin: 15px 0;">
+        
+        <h3 style="color: var(--gold-glow); margin-bottom: 8px;">💡 Idées cadeaux / Liste de souhaits de ta cible</h3>
+        <p id="target-wishlist" style="color: #cbd5e1; font-style: italic; margin: 0;">Aucune idée enregistrée pour l'instant.</p>
       </div>
 
+      <!-- TA PROPRE LISTE DE SOUHAITS PLUS BAS -->
       <div class="card">
-        <h3>📝 Ma liste de souhaits</h3>
+        <h3>📝 Ma liste de souhaits personnelle</h3>
         <textarea id="my-wishlist" rows="3" placeholder="Écris tes idées cadeaux ici..."></textarea>
         <button class="btn-primary" onclick="saveWishlist()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
           Enregistrer ma liste ✨
         </button>
-      </div>
-
-      <div class="card">
-        <h3>💡 Liste de souhaits de ta cible</h3>
-        <p id="target-wishlist" style="color: #cbd5e1; font-style: italic;">Aucune idée enregistrée pour l'instant.</p>
       </div>
       
       <button class="btn-primary btn-danger" onclick="logout()" style="margin-top:20px;">Se déconnecter</button>
@@ -478,7 +480,7 @@
     }
 
     db.ref('assignments').set(result);
-    alert("🎉 Le tirage au sort a été effectué avec succès !");
+    alert("🎉 Le tirage au sort au été effectué avec succès !");
   }
 </script>
 
