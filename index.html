@@ -6,167 +6,217 @@
   <title>Tirage au Sort - Noël 2026 🎄</title>
   <style>
     :root {
-      --primary-red: #bb2525;
-      --deep-red: #8a1717;
-      --primary-green: #165b33;
-      --light-green: #1f7a47;
-      --bg-color: #0b3c1d;
-      --card-bg: #ffffff;
-      --text-main: #2c3e50;
-      --gold: #f39c12;
+      --gold-glow: #ffea79;
+      --card-bg: rgba(20, 16, 45, 0.75);
+      --input-bg: rgba(255, 255, 255, 0.95);
+      --primary-blue: #3b82f6;
+      --primary-green: #10b981;
+      --primary-red: #ef4444;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, var(--bg-color) 0%, #06220f 100%);
-      color: var(--text-main);
-      min-height: 100vh;
       margin: 0;
       padding: 20px;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
+      background: #0f0a2a url('https://images.unsplash.com/photo-1543589077-47d51b39653f?q=80&w=1920') no-repeat center center fixed;
+      background-size: cover;
+      color: #ffffff;
+      position: relative;
+    }
+
+    /* Effet d'ombrage sombre sur le fond */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, rgba(15, 10, 42, 0.4) 0%, rgba(5, 3, 15, 0.85) 100%);
+      z-index: 0;
     }
 
     .container {
-      max-width: 650px;
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
       width: 100%;
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.4);
-      border: 4px solid var(--gold);
-      margin-top: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 35px 30px;
+      box-shadow: 0 0 30px rgba(255, 234, 121, 0.25), 0 20px 50px rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 234, 121, 0.5);
+    }
+
+    /* En-tête / Logo */
+    .header-logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .header-logo svg {
+      width: 45px;
+      height: 45px;
+      fill: #ffffff;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));
+    }
+
+    .header-logo h2 {
+      margin: 5px 0 0 0;
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: #e2e8f0;
     }
 
     h1 {
-      color: var(--primary-red);
+      color: #fff;
       text-align: center;
-      margin-bottom: 25px;
+      margin: 10px 0 25px 0;
       font-size: 2.2rem;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      font-weight: 700;
+      text-shadow: 0 0 12px rgba(255,255,255,0.5);
     }
 
+    /* Onglets Nav */
     .tabs {
       display: flex;
       gap: 12px;
       margin-bottom: 25px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px;
+      border-radius: 12px;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 14px;
+      padding: 12px;
       border: none;
-      background: #e4e7eb;
-      border-radius: 10px;
+      background: transparent;
+      border-radius: 8px;
       cursor: pointer;
-      font-weight: 700;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-      color: #555;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      transition: all 0.3s ease;
     }
 
     .tab-btn.active {
-      background: var(--primary-green);
-      color: white;
-      box-shadow: 0 4px 12px rgba(22, 91, 51, 0.3);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
     }
 
     .section { display: none; }
-    .section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+    .section.active { display: block; animation: fadeIn 0.4s ease-in-out; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Formulaires & Inputs */
+    label, p.desc {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      display: block;
     }
 
     input, textarea {
       width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 2px solid #ddd;
-      box-sizing: border-box;
+      padding: 14px 16px;
+      margin: 10px 0 18px 0;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--input-bg);
+      color: #0f172a;
       font-size: 1rem;
-      transition: border-color 0.2s;
+      font-weight: 500;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.2s;
     }
 
     input:focus, textarea:focus {
-      border-color: var(--primary-green);
       outline: none;
+      border-color: var(--gold-glow);
+      box-shadow: 0 0 10px rgba(255, 234, 121, 0.5);
     }
 
-    button {
+    /* Boutons stylisés */
+    button.btn-primary {
       width: 100%;
       padding: 14px;
-      margin: 10px 0;
-      border-radius: 8px;
+      border-radius: 30px;
       border: none;
-      background: var(--primary-green);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: white;
       font-weight: 700;
       font-size: 1rem;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5);
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
     }
 
-    button:hover { background: var(--light-green); }
-    button:active { transform: scale(0.98); }
-
-    .btn-danger {
-      background: var(--primary-red);
-      box-shadow: 0 4px 10px rgba(187, 37, 37, 0.3);
+    button.btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(37, 99, 235, 0.7);
     }
-    .btn-danger:hover { background: var(--deep-red); }
 
+    button.btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Cards internes */
     .card {
-      background: #f8f9fa;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 20px;
-      border-radius: 12px;
+      border-radius: 14px;
       margin: 15px 0;
-      border-left: 6px solid var(--primary-green);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .card h3 {
       margin-top: 0;
-      color: var(--primary-green);
+      color: var(--gold-glow);
+      font-size: 1.1rem;
     }
 
     .member-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #fdfdfd;
-      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 12px 16px;
       margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #e1e4e8;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
-    .member-info strong {
-      font-size: 1.1rem;
-      color: var(--text-main);
-    }
-
-    .member-info span {
-      color: #666;
-      font-size: 0.9rem;
-      margin-left: 8px;
+    .member-item code {
+      background: rgba(0,0,0,0.4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: var(--gold-glow);
     }
 
     hr {
       border: 0;
       height: 1px;
-      background: #e1e4e8;
+      background: rgba(255, 255, 255, 0.15);
       margin: 25px 0;
-    }
-
-    .login-card {
-      background: #fff;
-      padding: 10px 0;
     }
   </style>
 
@@ -177,6 +227,11 @@
 <body>
 
 <div class="container">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6L10.5,9.5L7,10L9.5,12.5L9,16L12,14.25L15,16L14.5,12.5L17,10L13.5,9.5L12,6Z"/></svg>
+    <h2>Merry Christmas</h2>
+  </div>
+
   <h1>🎄 Noël 2026 🎅</h1>
 
   <div class="tabs">
@@ -186,60 +241,64 @@
 
   <!-- SECTION UTILISATEUR -->
   <div id="user-section" class="section active">
-    <div id="login-box" class="login-card">
-      <h3>Espace Participant</h3>
-      <p style="color: #666; font-size: 0.95rem;">Entre ton code PIN personnel à 4 chiffres fourni par l'organisateur :</p>
+    <div id="login-box">
+      <h3 style="margin-top:0;">Espace Participant</h3>
+      <p class="desc">Entre ton code PIN personnel à 4 chiffres fourni par l'organisateur :</p>
       <input type="number" id="pin-input" placeholder="Ex: 1001" onkeydown="checkUserEnter(event)">
-      <button onclick="loginUser()">Accéder à mon tirage</button>
+      <button class="btn-primary" onclick="loginUser()">
+        Accéder à mon tirage 🛒
+      </button>
     </div>
 
     <div id="user-dashboard" style="display:none;">
-      <h2 id="welcome-msg" style="text-align:center; color: var(--primary-green);"></h2>
+      <h2 id="welcome-msg" style="text-align:center; color: var(--gold-glow); margin-top:0;"></h2>
       
-      <div class="card" style="border-left-color: var(--primary-red);">
+      <div class="card" style="border-color: rgba(239, 68, 68, 0.5);">
         <h3>🎯 Tu dois offrir un cadeau à :</h3>
-        <h2 id="target-name" style="color: var(--primary-red); margin: 10px 0; font-size: 1.8rem;">...</h2>
+        <h2 id="target-name" style="color: #ffffff; margin: 10px 0; font-size: 2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3);">...</h2>
       </div>
 
       <div class="card">
         <h3>📝 Ma liste de souhaits</h3>
-        <textarea id="my-wishlist" rows="4" placeholder="Écris tes idées cadeaux, ce que tu aimerais recevoir..."></textarea>
-        <button onclick="saveWishlist()">Enregistrer ma liste</button>
+        <textarea id="my-wishlist" rows="3" placeholder="Écris tes idées cadeaux ici..."></textarea>
+        <button class="btn-primary" onclick="saveWishlist()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+          Enregistrer ma liste ✨
+        </button>
       </div>
 
       <div class="card">
         <h3>💡 Liste de souhaits de ta cible</h3>
-        <p id="target-wishlist" style="font-style: italic; color: #555;">Aucune idée enregistrée pour l'instant.</p>
+        <p id="target-wishlist" style="color: #cbd5e1; font-style: italic;">Aucune idée enregistrée pour l'instant.</p>
       </div>
       
-      <button onclick="logout()" class="btn-danger" style="margin-top:20px;">Se déconnecter</button>
+      <button class="btn-primary btn-danger" onclick="logout()" style="margin-top:20px;">Se déconnecter</button>
     </div>
   </div>
 
   <!-- SECTION ADMIN -->
   <div id="admin-section" class="section">
     <div id="admin-login">
-      <h3>Administration</h3>
-      <p style="color: #666; font-size: 0.95rem;">Entre le code PIN administrateur :</p>
-      <input type="password" id="admin-pin" placeholder="Code PIN (999 ou 9999)" onkeydown="checkAdminEnter(event)">
-      <button onclick="loginAdmin()">Entrer dans l'admin</button>
+      <h3 style="margin-top:0;">Administration</h3>
+      <p class="desc">Entre le code PIN administrateur (999 ou 9999) :</p>
+      <input type="password" id="admin-pin" placeholder="Code PIN Admin" onkeydown="checkAdminEnter(event)">
+      <button class="btn-primary" onclick="loginAdmin()">Entrer dans l'admin 🔓</button>
     </div>
 
     <div id="admin-dashboard" style="display:none;">
-      <h3>👥 Membres de la Famille</h3>
+      <h3 style="margin-top:0; color: var(--gold-glow);">👥 Membres de la Famille</h3>
       <div style="display:flex; gap:10px; align-items: center;">
         <input type="text" id="new-member-name" placeholder="Prénom (ex: Papa, Maman...)" onkeydown="checkMemberEnter(event)" style="margin:0;">
-        <button onclick="addMember()" style="width: auto; margin:0; padding: 14px 20px;">Ajouter</button>
+        <button class="btn-primary" onclick="addMember()" style="width: auto; margin:0; padding: 14px 22px; border-radius: 10px;">Ajouter</button>
       </div>
 
       <div id="members-list" style="margin-top: 15px; max-height: 250px; overflow-y: auto;"></div>
 
       <hr>
-      <h3>🎲 Gestion du Tirage au Sort</h3>
-      <p style="color: #666; font-size: 0.9rem;">Une fois que tout le monde est inscrit, lance le tirage. (Les attributions s'actualisent en direct).</p>
-      <button onclick="generateDraw()" class="btn-danger">Lancer / Relancer le Tirage</button>
+      <h3 style="color: var(--gold-glow);">🎲 Gestion du Tirage au Sort</h3>
+      <p class="desc">Une fois toute la famille inscrite, lance le tirage automatique.</p>
+      <button class="btn-primary btn-danger" onclick="generateDraw()">Lancer / Relancer le Tirage 🎲</button>
       
-      <button onclick="logoutAdmin()" style="margin-top:20px; background:#6c757d;">Quitter l'Admin</button>
+      <button class="btn-primary" onclick="logoutAdmin()" style="margin-top:20px; background: rgba(255,255,255,0.2); box-shadow:none;">Quitter l'Admin</button>
     </div>
   </div>
 </div>
@@ -255,7 +314,7 @@
   let currentUser = null;
   let allData = { members: {}, assignments: {} };
 
-  // Écoute en temps réel
+  // Synchronisation Firebase en temps réel
   db.ref().on('value', (snapshot) => {
     allData = snapshot.val() || { members: {}, assignments: {} };
     if (!allData.members) allData.members = {};
@@ -282,7 +341,7 @@
   function checkAdminEnter(e) { if (e.key === 'Enter') loginAdmin(); }
   function checkMemberEnter(e) { if (e.key === 'Enter') addMember(); }
 
-  // Auth User
+  // Connexion Participant
   function loginUser() {
     const pin = document.getElementById('pin-input').value.trim();
     const memberKey = Object.keys(allData.members).find(k => allData.members[k].pin == pin);
@@ -330,7 +389,7 @@
     document.getElementById('pin-input').value = '';
   }
 
-  // Admin Functions
+  // Connexion & Actions Admin
   function loginAdmin() {
     const pin = document.getElementById('admin-pin').value.trim();
     if (pin === '999' || pin === '9999') {
@@ -363,7 +422,6 @@
   function removeMember(id) {
     if (confirm("Voulez-vous vraiment supprimer ce membre ?")) {
       db.ref('members/' + id).remove();
-      // Si on supprime, on efface aussi le tirage pour éviter les bugs d'attribution
       db.ref('assignments').remove();
     }
   }
@@ -374,7 +432,7 @@
     const keys = Object.keys(allData.members);
     
     if (keys.length === 0) {
-      list.innerHTML = '<p style="color: #888; text-align: center;">Aucun membre pour le moment.</p>';
+      list.innerHTML = '<p style="color: #cbd5e1; text-align: center;">Aucun membre pour le moment.</p>';
       return;
     }
 
@@ -382,11 +440,11 @@
       const m = allData.members[id];
       list.innerHTML += `
         <div class="member-item">
-          <div class="member-info">
-            <strong>${m.name}</strong> 
-            <span>(PIN: <code>${m.pin}</code>)</span>
+          <div>
+            <strong style="color:#fff;">${m.name}</strong> 
+            <span style="color:#cbd5e1; font-size:0.9rem; margin-left:8px;">(PIN: <code>${m.pin}</code>)</span>
           </div>
-          <button onclick="removeMember('${id}')" class="btn-danger" style="width:auto; padding: 6px 12px; margin:0; font-size: 0.9rem;">Supprimer</button>
+          <button onclick="removeMember('${id}')" class="btn-primary btn-danger" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px;">Supprimer</button>
         </div>
       `;
     });
@@ -404,7 +462,6 @@
     let valid = false;
     let attempts = 0;
 
-    // Boucle pour éviter qu'une personne s'tire elle-même
     while (!valid && attempts < 1000) {
       receivers.sort(() => Math.random() - 0.5);
       valid = true;
