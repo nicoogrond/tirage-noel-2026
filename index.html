@@ -53,7 +53,7 @@
 
     .header-logo {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .header-logo svg {
@@ -75,10 +75,31 @@
     h1 {
       color: #fff;
       text-align: center;
-      margin: 10px 0 25px 0;
+      margin: 10px 0 20px 0;
       font-size: 2.2rem;
       font-weight: 700;
       text-shadow: 0 0 12px rgba(255,255,255,0.5);
+    }
+
+    .budget-banner {
+      background: linear-gradient(135deg, rgba(255, 234, 121, 0.18) 0%, rgba(16, 185, 129, 0.22) 100%);
+      border: 2px solid var(--gold-glow);
+      border-radius: 14px;
+      padding: 12px 15px;
+      margin-bottom: 25px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 234, 121, 0.2);
+    }
+
+    .budget-banner p {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #ffffff;
+    }
+
+    .budget-banner strong {
+      color: var(--gold-glow);
+      font-size: 1.2rem;
     }
 
     .tabs {
@@ -192,28 +213,6 @@
       font-size: 1.1rem;
     }
 
-    .budget-banner {
-      background: linear-gradient(135deg, rgba(255, 234, 121, 0.2) 0%, rgba(16, 185, 129, 0.25) 100%);
-      border: 2px solid var(--gold-glow);
-      border-radius: 14px;
-      padding: 15px;
-      margin-bottom: 20px;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(255, 234, 121, 0.25);
-      animation: fadeIn 0.4s ease-in-out;
-    }
-
-    .budget-banner p {
-      margin: 0;
-      font-size: 1.05rem;
-      color: #ffffff;
-    }
-
-    .budget-banner strong {
-      color: var(--gold-glow);
-      font-size: 1.25rem;
-    }
-
     .member-item, .wish-item, .potluck-item {
       display: flex;
       justify-content: space-between;
@@ -252,32 +251,6 @@
     }
     .wish-link-btn:hover { background: #2563eb; }
 
-    /* Grille de vote */
-    .vote-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .vote-btn {
-      background: rgba(255, 255, 255, 0.15);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      padding: 12px;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-    .vote-btn:hover { background: rgba(255, 255, 255, 0.25); border-color: var(--gold-glow); }
-    .vote-btn.selected {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      border-color: var(--gold-glow);
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-    }
-
     hr {
       border: 0;
       height: 1px;
@@ -300,8 +273,10 @@
 
   <h1>🎄 Noël 2026 🎅</h1>
 
-  <!-- BANNIÈRE BUDGET OFFICIEL (S'affiche quand tout le monde a voté) -->
-  <div id="final-budget-banner" class="budget-banner" style="display: none;"></div>
+  <!-- BANNIÈRE BUDGET FIXE -->
+  <div class="budget-banner">
+    <p>💰 Budget des cadeaux fixé à : <strong>40 $</strong></p>
+  </div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('user')">🎁 Mon Espace</button>
@@ -339,7 +314,7 @@
       <div class="card">
         <h3>📝 Ma liste de souhaits</h3>
         
-        <label>Ajouter une idée cadeau :</label>
+        <label>Ajouter une idée cadeau (budget ~40 $) :</label>
         <input type="text" id="item-name" placeholder="Nom du cadeau (ex: Casque audio, Livre...)">
         <input type="url" id="item-link" placeholder="Lien web / URL (ex: https://...)" onkeydown="checkWishEnter(event)">
 
@@ -353,23 +328,7 @@
         </div>
       </div>
 
-      <!-- 3. VOTE BUDGET -->
-      <div class="card">
-        <h3>📊 Vote pour le Budget du Cadeau</h3>
-        <p class="desc">Choisis le montant que tu souhaites dépenser :</p>
-        
-        <div class="vote-grid">
-          <button class="vote-btn" id="vote-15" onclick="castVote(15)">15 $</button>
-          <button class="vote-btn" id="vote-25" onclick="castVote(25)">25 $</button>
-          <button class="vote-btn" id="vote-50" onclick="castVote(50)">50 $</button>
-        </div>
-
-        <div id="vote-results" style="color: #cbd5e1; font-size: 0.95rem; margin-top: 10px; text-align: center;">
-          Chargement des votes...
-        </div>
-      </div>
-
-      <!-- 4. BOUFFE & SOUPER -->
+      <!-- 3. BOUFFE & SOUPER -->
       <div class="card">
         <h3>🍲 Qu'est-ce qu'on apporte pour le souper ?</h3>
         <p class="desc">Choisis un élément dans la liste de l'organisateur pour l'apporter :</p>
@@ -430,18 +389,16 @@
   const db = firebase.database();
 
   let currentUser = null;
-  let allData = { members: {}, assignments: {}, votes: {}, potluck: {} };
+  let allData = { members: {}, assignments: {}, potluck: {} };
 
   db.ref().on('value', (snapshot) => {
-    allData = snapshot.val() || { members: {}, assignments: {}, votes: {}, potluck: {} };
+    allData = snapshot.val() || { members: {}, assignments: {}, potluck: {} };
     if (!allData.members) allData.members = {};
     if (!allData.assignments) allData.assignments = {};
-    if (!allData.votes) allData.votes = {};
     if (!allData.potluck) allData.potluck = {};
     
     renderAdminMembers();
     renderAdminPotluckList();
-    renderVotes();
     renderPotluck();
     if (currentUser) updateUserData();
   });
@@ -496,90 +453,7 @@
       document.getElementById('target-name').innerText = "Le tirage n'a pas encore eu lieu !";
       document.getElementById('target-wishlist-items').innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">-</p>';
     }
-    renderVotes();
     renderPotluck();
-  }
-
-  // --- VOTE BUDGET ---
-  function castVote(amount) {
-    if (!currentUser) {
-      alert("Connecte-toi d'abord en haut pour voter !");
-      return;
-    }
-    db.ref('votes/' + currentUser.id).set(amount);
-  }
-
-  function renderVotes() {
-    const votes = allData.votes || {};
-    const memberKeys = Object.keys(allData.members || {});
-    const totalMembers = memberKeys.length;
-    
-    const counts = { 15: 0, 25: 0, 50: 0 };
-    let userVotedAmount = null;
-    let validVotesCount = 0;
-
-    // On ne compte que les votes des membres actuellement inscrits
-    memberKeys.forEach(mId => {
-      if (votes[mId] !== undefined) {
-        const amt = votes[mId];
-        if (counts[amt] !== undefined) {
-          counts[amt]++;
-          validVotesCount++;
-        }
-        if (currentUser && mId === currentUser.id) {
-          userVotedAmount = amt;
-        }
-      }
-    });
-
-    [15, 25, 50].forEach(amt => {
-      const btn = document.getElementById('vote-' + amt);
-      if (btn) {
-        if (userVotedAmount === amt) {
-          btn.classList.add('selected');
-          btn.innerText = amt + " $ (Voté ✅)";
-        } else {
-          btn.classList.remove('selected');
-          btn.innerText = amt + " $";
-        }
-      }
-    });
-
-    let resultsHtml = `Votes enregistrés : <strong>${validVotesCount} / ${totalMembers}</strong><br>`;
-    resultsHtml += `15 $ : <strong>${counts[15]}</strong> | 25 $ : <strong>${counts[25]}</strong> | 50 $ : <strong>${counts[50]}</strong>`;
-    
-    const banner = document.getElementById('final-budget-banner');
-
-    if (totalMembers > 0 && validVotesCount >= totalMembers) {
-      // Tout le monde a voté : on détermine la majorité
-      let maxCount = -1;
-      let winning = [];
-      Object.keys(counts).forEach(amt => {
-        if (counts[amt] > maxCount) {
-          maxCount = counts[amt];
-          winning = [amt];
-        } else if (counts[amt] === maxCount && maxCount > 0) {
-          winning.push(amt);
-        }
-      });
-
-      const winningText = winning.join(' $ ou ') + ' $';
-      resultsHtml += `<br><br>✅ <strong>Tout le monde a voté ! Le budget choisi par la majorité est de ${winningText}</strong>`;
-      
-      if (banner) {
-        banner.style.display = 'block';
-        banner.innerHTML = `<p>🎉 Le budget a été choisi par la majorité : <strong>${winningText}</strong><br><span style="font-size:0.9rem; color:#e2e8f0;">Le budget est de ${winningText} pour les cadeaux !</span></p>`;
-      }
-    } else {
-      // En attente des autres votes
-      if (banner) banner.style.display = 'none';
-      if (validVotesCount > 0) {
-        resultsHtml += `<br><span style="font-size:0.85rem; color:#94a3b8;">⏳ En attente que tous les membres votent pour officialiser le budget...</span>`;
-      }
-    }
-
-    const resContainer = document.getElementById('vote-results');
-    if (resContainer) resContainer.innerHTML = resultsHtml;
   }
 
   // --- REPAS / SOUPER (POTLUCK) ---
@@ -799,7 +673,6 @@
   function removeMember(id) {
     if (confirm("Voulez-vous vraiment supprimer ce membre ?")) {
       db.ref('members/' + id).remove();
-      db.ref('votes/' + id).remove();
       db.ref('assignments').remove();
     }
   }
