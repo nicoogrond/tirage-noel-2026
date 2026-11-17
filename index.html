@@ -173,6 +173,11 @@
       box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
     }
 
+    button.btn-warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    }
+
     .card {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -185,6 +190,28 @@
       margin-top: 0;
       color: var(--gold-glow);
       font-size: 1.1rem;
+    }
+
+    .budget-banner {
+      background: linear-gradient(135deg, rgba(255, 234, 121, 0.2) 0%, rgba(16, 185, 129, 0.25) 100%);
+      border: 2px solid var(--gold-glow);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 234, 121, 0.25);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .budget-banner p {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #ffffff;
+    }
+
+    .budget-banner strong {
+      color: var(--gold-glow);
+      font-size: 1.25rem;
     }
 
     .member-item, .wish-item, .potluck-item {
@@ -273,6 +300,9 @@
 
   <h1>🎄 Noël 2026 🎅</h1>
 
+  <!-- BANNIÈRE BUDGET OFFICIEL (S'affiche quand tout le monde a voté) -->
+  <div id="final-budget-banner" class="budget-banner" style="display: none;"></div>
+
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('user')">🎁 Mon Espace</button>
     <button class="tab-btn" onclick="switchTab('admin')">⚙️ Admin</button>
@@ -339,7 +369,7 @@
         </div>
       </div>
 
-      <!-- 4. BOUFFE & SOUPER (CHOIX DES ITEMS Définis par l'Admin) -->
+      <!-- 4. BOUFFE & SOUPER -->
       <div class="card">
         <h3>🍲 Qu'est-ce qu'on apporte pour le souper ?</h3>
         <p class="desc">Choisis un élément dans la liste de l'organisateur pour l'apporter :</p>
@@ -381,8 +411,11 @@
 
       <hr>
       <h3 style="color: var(--gold-glow);">🎲 Gestion du Tirage au Sort</h3>
-      <p class="desc">Une fois toute la famille inscrite, lance le tirage automatique.</p>
-      <button class="btn-primary btn-danger" onclick="generateDraw()">Lancer / Relancer le Tirage 🎲</button>
+      <p class="desc">Une fois toute la famille inscrite, lance le tirage automatique (ou annule-le pour tes tests).</p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn-primary btn-danger" onclick="generateDraw()">Lancer / Relancer le Tirage 🎲</button>
+        <button class="btn-primary btn-warning" onclick="cancelDraw()">❌ Annuler / Réinitialiser le tirage</button>
+      </div>
       
       <button class="btn-primary" onclick="logoutAdmin()" style="margin-top:20px; background: rgba(255,255,255,0.2); box-shadow:none;">Quitter l'Admin</button>
     </div>
@@ -478,13 +511,25 @@
 
   function renderVotes() {
     const votes = allData.votes || {};
+    const memberKeys = Object.keys(allData.members || {});
+    const totalMembers = memberKeys.length;
+    
     const counts = { 15: 0, 25: 0, 50: 0 };
     let userVotedAmount = null;
+    let validVotesCount = 0;
 
-    Object.keys(votes).forEach(userId => {
-      const amt = votes[userId];
-      if (counts[amt] !== undefined) counts[amt]++;
-      if (currentUser && userId === currentUser.id) userVotedAmount = amt;
+    // On ne compte que les votes des membres actuellement inscrits
+    memberKeys.forEach(mId => {
+      if (votes[mId] !== undefined) {
+        const amt = votes[mId];
+        if (counts[amt] !== undefined) {
+          counts[amt]++;
+          validVotesCount++;
+        }
+        if (currentUser && mId === currentUser.id) {
+          userVotedAmount = amt;
+        }
+      }
     });
 
     [15, 25, 50].forEach(amt => {
@@ -500,10 +545,13 @@
       }
     });
 
-    const totalVotes = Object.keys(votes).length;
-    let resultsHtml = `Total votes : <strong>${totalVotes}</strong> | 15$: ${counts[15]} | 25$: ${counts[25]} | 50$: ${counts[50]}`;
+    let resultsHtml = `Votes enregistrés : <strong>${validVotesCount} / ${totalMembers}</strong><br>`;
+    resultsHtml += `15 $ : <strong>${counts[15]}</strong> | 25 $ : <strong>${counts[25]}</strong> | 50 $ : <strong>${counts[50]}</strong>`;
     
-    if (totalVotes > 0) {
+    const banner = document.getElementById('final-budget-banner');
+
+    if (totalMembers > 0 && validVotesCount >= totalMembers) {
+      // Tout le monde a voté : on détermine la majorité
       let maxCount = -1;
       let winning = [];
       Object.keys(counts).forEach(amt => {
@@ -514,7 +562,20 @@
           winning.push(amt);
         }
       });
-      resultsHtml += `<br>🎯 <strong>En tête : ${winning.join(' $ ou ')} $</strong>`;
+
+      const winningText = winning.join(' $ ou ') + ' $';
+      resultsHtml += `<br><br>✅ <strong>Tout le monde a voté ! Le budget choisi par la majorité est de ${winningText}</strong>`;
+      
+      if (banner) {
+        banner.style.display = 'block';
+        banner.innerHTML = `<p>🎉 Le budget a été choisi par la majorité : <strong>${winningText}</strong><br><span style="font-size:0.9rem; color:#e2e8f0;">Le budget est de ${winningText} pour les cadeaux !</span></p>`;
+      }
+    } else {
+      // En attente des autres votes
+      if (banner) banner.style.display = 'none';
+      if (validVotesCount > 0) {
+        resultsHtml += `<br><span style="font-size:0.85rem; color:#94a3b8;">⏳ En attente que tous les membres votent pour officialiser le budget...</span>`;
+      }
     }
 
     const resContainer = document.getElementById('vote-results');
@@ -599,14 +660,11 @@
       let actionBtn = '';
 
       if (!item.bringerId || item.bringerId === '') {
-        // Libre
         actionBtn = `<button onclick="assignPotluckItem('${id}', true)" class="btn-primary" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Je l'apporte 🙋‍♂️</button>`;
       } else if (currentUser && item.bringerId === currentUser.id) {
-        // Pris par moi
         actionBtn = `<button onclick="assignPotluckItem('${id}', false)" class="btn-primary btn-danger" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px;">Annuler (C'est plus moi)</button>`;
       } else {
-        // Pris par un autre
-        actionBtn = `<span style="color: #cbd5e1; font-size: 0.9rem; font-style: italic;">Apporté par ${item.bringerName}</span>`;
+        actionBtn = `<span style="color: #cbd5e1; font-size: 0.9rem; font-style: italic;">Apporté par <strong>${item.bringerName}</strong></span>`;
       }
 
       html += `
@@ -741,6 +799,7 @@
   function removeMember(id) {
     if (confirm("Voulez-vous vraiment supprimer ce membre ?")) {
       db.ref('members/' + id).remove();
+      db.ref('votes/' + id).remove();
       db.ref('assignments').remove();
     }
   }
@@ -804,6 +863,13 @@
 
     db.ref('assignments').set(result);
     alert("🎉 Le tirage au sort a été effectué avec succès !");
+  }
+
+  function cancelDraw() {
+    if (confirm("Veux-tu vraiment annuler le tirage au sort en cours ? Personne ne verra plus sa cible tant que tu n'auras pas relancé un tirage.")) {
+      db.ref('assignments').remove();
+      alert("Le tirage au sort a été annulé et réinitialisé.");
+    }
   }
 </script>
 
