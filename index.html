@@ -83,24 +83,22 @@
 
     .tabs {
       display: flex;
-      gap: 8px;
+      gap: 12px;
       margin-bottom: 25px;
       background: rgba(0, 0, 0, 0.4);
       padding: 6px;
       border-radius: 12px;
-      flex-wrap: wrap;
     }
 
     .tab-btn {
       flex: 1;
-      min-width: 120px;
-      padding: 10px;
+      padding: 12px;
       border: none;
       background: transparent;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #cbd5e1;
       transition: all 0.3s ease;
     }
@@ -238,9 +236,9 @@
       background: rgba(255, 255, 255, 0.15);
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 12px;
-      padding: 15px;
+      padding: 12px;
       color: white;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s;
@@ -277,26 +275,24 @@
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('user')">🎁 Mon Espace</button>
-    <button class="tab-btn" onclick="switchTab('vote')">📊 Vote Budget</button>
-    <button class="tab-btn" onclick="switchTab('potluck')">🍲 Bouffe & Souper</button>
     <button class="tab-btn" onclick="switchTab('admin')">⚙️ Admin</button>
   </div>
 
-  <!-- SECTION UTILISATEUR -->
+  <!-- SECTION UTILISATEUR (TOUT SUR LA MÊME PAGE) -->
   <div id="user-section" class="section active">
     <div id="login-box">
       <h3 style="margin-top:0;">Espace Participant</h3>
       <p class="desc">Entre ton code PIN personnel à 4 chiffres fourni par l'organisateur :</p>
       <input type="number" id="pin-input" placeholder="Ex: 1001" onkeydown="checkUserEnter(event)">
       <button class="btn-primary" onclick="loginUser()">
-        Accéder à mon tirage 🛒
+        Accéder à mon espace 🛒
       </button>
     </div>
 
     <div id="user-dashboard" style="display:none;">
       <h2 id="welcome-msg" style="text-align:center; color: var(--gold-glow); margin-top:0;"></h2>
       
-      <!-- CIBLE & SA LISTE DE SOUHAITS -->
+      <!-- 1. CIBLE & SA LISTE DE SOUHAITS -->
       <div class="card" style="border-color: rgba(239, 68, 68, 0.5);">
         <h3>🎯 Tu dois offrir un cadeau à :</h3>
         <h2 id="target-name" style="color: #ffffff; margin: 10px 0; font-size: 2rem; text-shadow: 0 0 10px rgba(255,255,255,0.3);">...</h2>
@@ -309,7 +305,7 @@
         </div>
       </div>
 
-      <!-- PROPRE LISTE DE SOUHAITS -->
+      <!-- 2. PROPRE LISTE DE SOUHAITS -->
       <div class="card">
         <h3>📝 Ma liste de souhaits</h3>
         
@@ -326,47 +322,33 @@
           <p style="color: #cbd5e1; font-style: italic; margin: 0;">Votre liste est vide.</p>
         </div>
       </div>
+
+      <!-- 3. VOTE BUDGET -->
+      <div class="card">
+        <h3>📊 Vote pour le Budget du Cadeau</h3>
+        <p class="desc">Choisis le montant que tu souhaites dépenser :</p>
+        
+        <div class="vote-grid">
+          <button class="vote-btn" id="vote-15" onclick="castVote(15)">15 $</button>
+          <button class="vote-btn" id="vote-25" onclick="castVote(25)">25 $</button>
+          <button class="vote-btn" id="vote-50" onclick="castVote(50)">50 $</button>
+        </div>
+
+        <div id="vote-results" style="color: #cbd5e1; font-size: 0.95rem; margin-top: 10px; text-align: center;">
+          Chargement des votes...
+        </div>
+      </div>
+
+      <!-- 4. BOUFFE & SOUPER (CHOIX DES ITEMS Définis par l'Admin) -->
+      <div class="card">
+        <h3>🍲 Qu'est-ce qu'on apporte pour le souper ?</h3>
+        <p class="desc">Choisis un élément dans la liste de l'organisateur pour l'apporter :</p>
+        <div id="potluck-list">
+          <p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucun élément dans la liste pour le moment.</p>
+        </div>
+      </div>
       
       <button class="btn-primary btn-danger" onclick="logout()" style="margin-top:20px;">Se déconnecter</button>
-    </div>
-  </div>
-
-  <!-- SECTION VOTE BUDGET -->
-  <div id="vote-section" class="section">
-    <div class="card">
-      <h3 style="margin-top:0; color: var(--gold-glow);">📊 Vote pour le Budget du Cadeau</h3>
-      <p class="desc">Choisis le montant que tu souhaites dépenser pour le Secret Santa. Le montant qui a le plus de votes l'emporte !</p>
-      
-      <div class="vote-grid">
-        <button class="vote-btn" id="vote-15" onclick="castVote(15)">15 $</button>
-        <button class="vote-btn" id="vote-25" onclick="castVote(25)">25 $</button>
-        <button class="vote-btn" id="vote-50" onclick="castVote(50)">50 $</button>
-      </div>
-
-      <hr>
-
-      <h3 style="color: var(--gold-glow);">📈 Résultats en direct :</h3>
-      <div id="vote-results" style="color: #cbd5e1; font-size: 1rem; line-height: 1.6;">
-        Chargement des votes...
-      </div>
-    </div>
-  </div>
-
-  <!-- SECTION BOUFFE & SOUPER -->
-  <div id="potluck-section" class="section">
-    <div class="card">
-      <h3 style="margin-top:0; color: var(--gold-glow);">🍲 Qu'est-ce qu'on apporte pour le souper ?</h3>
-      <p class="desc">Inscris un plat ou sélectionne ce que tu veux apporter pour que tout le monde sache quoi amener !</p>
-      
-      <div style="display:flex; gap:10px; align-items: center; margin-bottom: 15px;">
-        <input type="text" id="new-potluck-item" placeholder="Ex: Chips, Salade, Bûche, Boissons..." onkeydown="checkPotluckEnter(event)" style="margin:0;">
-        <button class="btn-primary" onclick="addPotluckItem()" style="width: auto; margin:0; padding: 12px 20px; border-radius: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Proposer</button>
-      </div>
-
-      <h4 style="color: var(--gold-glow); margin: 15px 0 8px 0;">Liste des apports :</h4>
-      <div id="potluck-list">
-        <p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucun plat inscrit pour le moment.</p>
-      </div>
     </div>
   </div>
 
@@ -386,7 +368,16 @@
         <button class="btn-primary" onclick="addMember()" style="width: auto; margin:0; padding: 14px 22px; border-radius: 10px;">Ajouter</button>
       </div>
 
-      <div id="members-list" style="margin-top: 15px; max-height: 250px; overflow-y: auto;"></div>
+      <div id="members-list" style="margin-top: 15px; max-height: 200px; overflow-y: auto;"></div>
+
+      <hr>
+      <h3 style="color: var(--gold-glow);">🍲 Liste officielle du Souper (Repas)</h3>
+      <p class="desc">Définis ici tout ce qui doit être apporté pour le souper :</p>
+      <div style="display:flex; gap:10px; align-items: center; margin-bottom: 10px;">
+        <input type="text" id="admin-potluck-item" placeholder="Ex: Chips, Salade de patates, Bûche..." onkeydown="checkAdminPotluckEnter(event)" style="margin:0;">
+        <button class="btn-primary" onclick="addAdminPotluckItem()" style="width: auto; margin:0; padding: 12px 18px; border-radius: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Ajouter</button>
+      </div>
+      <div id="admin-potluck-list" style="max-height: 200px; overflow-y: auto;"></div>
 
       <hr>
       <h3 style="color: var(--gold-glow);">🎲 Gestion du Tirage au Sort</h3>
@@ -416,6 +407,7 @@
     if (!allData.potluck) allData.potluck = {};
     
     renderAdminMembers();
+    renderAdminPotluckList();
     renderVotes();
     renderPotluck();
     if (currentUser) updateUserData();
@@ -428,14 +420,8 @@
     if (tab === 'user') {
       document.querySelectorAll('.tab-btn')[0].classList.add('active');
       document.getElementById('user-section').classList.add('active');
-    } else if (tab === 'vote') {
-      document.querySelectorAll('.tab-btn')[1].classList.add('active');
-      document.getElementById('vote-section').classList.add('active');
-    } else if (tab === 'potluck') {
-      document.querySelectorAll('.tab-btn')[2].classList.add('active');
-      document.getElementById('potluck-section').classList.add('active');
     } else {
-      document.querySelectorAll('.tab-btn')[3].classList.add('active');
+      document.querySelectorAll('.tab-btn')[1].classList.add('active');
       document.getElementById('admin-section').classList.add('active');
     }
   }
@@ -444,7 +430,7 @@
   function checkAdminEnter(e) { if (e.key === 'Enter') loginAdmin(); }
   function checkMemberEnter(e) { if (e.key === 'Enter') addMember(); }
   function checkWishEnter(e) { if (e.key === 'Enter') addWishItem(); }
-  function checkPotluckEnter(e) { if (e.key === 'Enter') addPotluckItem(); }
+  function checkAdminPotluckEnter(e) { if (e.key === 'Enter') addAdminPotluckItem(); }
 
   function loginUser() {
     const pin = document.getElementById('pin-input').value.trim();
@@ -478,13 +464,13 @@
       document.getElementById('target-wishlist-items').innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">-</p>';
     }
     renderVotes();
+    renderPotluck();
   }
 
-  // --- GESTION DU VOTE ---
+  // --- VOTE BUDGET ---
   function castVote(amount) {
     if (!currentUser) {
-      alert("Tu dois d'abord te connecter dans 'Mon Espace' pour pouvoir voter !");
-      switchTab('user');
+      alert("Connecte-toi d'abord en haut pour voter !");
       return;
     }
     db.ref('votes/' + currentUser.id).set(amount);
@@ -498,18 +484,15 @@
     Object.keys(votes).forEach(userId => {
       const amt = votes[userId];
       if (counts[amt] !== undefined) counts[amt]++;
-      if (currentUser && userId === currentUser.id) {
-        userVotedAmount = amt;
-      }
+      if (currentUser && userId === currentUser.id) userVotedAmount = amt;
     });
 
-    // Style des boutons de vote
     [15, 25, 50].forEach(amt => {
       const btn = document.getElementById('vote-' + amt);
       if (btn) {
         if (userVotedAmount === amt) {
           btn.classList.add('selected');
-          btn.innerText = amt + " $ (Ton vote ✅)";
+          btn.innerText = amt + " $ (Voté ✅)";
         } else {
           btn.classList.remove('selected');
           btn.innerText = amt + " $";
@@ -517,56 +500,87 @@
       }
     });
 
-    // Affichage des résultats
     const totalVotes = Object.keys(votes).length;
-    let resultsHtml = `Total des participants ayant voté : <strong>${totalVotes}</strong><br><br>`;
+    let resultsHtml = `Total votes : <strong>${totalVotes}</strong> | 15$: ${counts[15]} | 25$: ${counts[25]} | 50$: ${counts[50]}`;
     
-    [15, 25, 50].forEach(amt => {
-      resultsHtml += `• <strong>${amt} $</strong> : ${counts[amt]} vote(s)<br>`;
-    });
-
-    // Trouver le gagnant
     if (totalVotes > 0) {
       let maxCount = -1;
-      let winningAmount = [];
+      let winning = [];
       Object.keys(counts).forEach(amt => {
         if (counts[amt] > maxCount) {
           maxCount = counts[amt];
-          winningAmount = [amt];
+          winning = [amt];
         } else if (counts[amt] === maxCount && maxCount > 0) {
-          winningAmount.push(amt);
+          winning.push(amt);
         }
       });
-
-      resultsHtml += `<br>🎯 <strong>Budget conseillé actuel : ${winningAmount.join(' $ ou ')} $</strong>`;
-    } else {
-      resultsHtml += `<br><em>Aucun vote enregistré pour l'instant. Sois le premier à voter !</em>`;
+      resultsHtml += `<br>🎯 <strong>En tête : ${winning.join(' $ ou ')} $</strong>`;
     }
 
     const resContainer = document.getElementById('vote-results');
     if (resContainer) resContainer.innerHTML = resultsHtml;
   }
 
-  // --- GESTION BOUFFE / SOUPER (POTLUCK) ---
-  function addPotluckItem() {
-    if (!currentUser) {
-      alert("Tu dois d'abord te connecter dans 'Mon Espace' !");
-      switchTab('user');
-      return;
-    }
-    const input = document.getElementById('new-potluck-item');
+  // --- REPAS / SOUPER (POTLUCK) ---
+  function addAdminPotluckItem() {
+    const input = document.getElementById('admin-potluck-item');
     const dish = input.value.trim();
     if (!dish) return;
 
     db.ref('potluck').push({
       dish: dish,
-      bringer: currentUser.name
+      bringerId: '',
+      bringerName: ''
     });
     input.value = '';
   }
 
-  function removePotluckItem(id) {
+  function removeAdminPotluckItem(id) {
     db.ref('potluck/' + id).remove();
+  }
+
+  function assignPotluckItem(id, take) {
+    if (!currentUser) {
+      alert("Connecte-toi d'abord !");
+      return;
+    }
+    if (take) {
+      db.ref('potluck/' + id).update({
+        bringerId: currentUser.id,
+        bringerName: currentUser.name
+      });
+    } else {
+      db.ref('potluck/' + id).update({
+        bringerId: '',
+        bringerName: ''
+      });
+    }
+  }
+
+  function renderAdminPotluckList() {
+    const container = document.getElementById('admin-potluck-list');
+    const potluck = allData.potluck || {};
+    const keys = Object.keys(potluck);
+
+    if (keys.length === 0) {
+      container.innerHTML = '<p style="color: #cbd5e1; font-style: italic; font-size: 0.9rem;">Aucun élément configuré.</p>';
+      return;
+    }
+
+    let html = '';
+    keys.forEach(id => {
+      const item = potluck[id];
+      html += `
+        <div class="potluck-item" style="padding: 8px 12px;">
+          <div>
+            <strong style="color:#fff;">${item.dish}</strong>
+            <br><span style="color:var(--gold-glow); font-size:0.85rem;">Assigné à : ${item.bringerName || 'Personne'}</span>
+          </div>
+          <button onclick="removeAdminPotluckItem('${id}')" class="btn-primary btn-danger" style="width:auto; padding: 4px 10px; margin:0; font-size: 0.8rem; border-radius:6px;">Supprimer</button>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
   }
 
   function renderPotluck() {
@@ -575,20 +589,32 @@
     const keys = Object.keys(potluck);
 
     if (keys.length === 0) {
-      container.innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucun plat inscrit pour le moment.</p>';
+      container.innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">L\'organisateur n\'a pas encore configuré la liste du souper.</p>';
       return;
     }
 
     let html = '';
     keys.forEach(id => {
       const item = potluck[id];
+      let actionBtn = '';
+
+      if (!item.bringerId || item.bringerId === '') {
+        // Libre
+        actionBtn = `<button onclick="assignPotluckItem('${id}', true)" class="btn-primary" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Je l'apporte 🙋‍♂️</button>`;
+      } else if (currentUser && item.bringerId === currentUser.id) {
+        // Pris par moi
+        actionBtn = `<button onclick="assignPotluckItem('${id}', false)" class="btn-primary btn-danger" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px;">Annuler (C'est plus moi)</button>`;
+      } else {
+        // Pris par un autre
+        actionBtn = `<span style="color: #cbd5e1; font-size: 0.9rem; font-style: italic;">Apporté par ${item.bringerName}</span>`;
+      }
+
       html += `
         <div class="potluck-item">
           <div>
             <strong style="color:#fff; font-size: 1.05rem;">🍴 ${item.dish}</strong>
-            <br><span style="color: var(--gold-glow); font-size: 0.9rem;">Apporté par : <strong>${item.bringer}</strong></span>
           </div>
-          ${currentUser && item.bringer === currentUser.name ? `<button onclick="removePotluckItem('${id}')" class="btn-primary btn-danger" style="width:auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-radius:6px;">Retirer</button>` : ''}
+          <div>${actionBtn}</div>
         </div>
       `;
     });
@@ -679,7 +705,6 @@
     document.getElementById('login-box').style.display = 'block';
     document.getElementById('user-dashboard').style.display = 'none';
     document.getElementById('pin-input').value = '';
-    renderVotes();
   }
 
   // --- ADMIN ---
@@ -689,6 +714,7 @@
       document.getElementById('admin-login').style.display = 'none';
       document.getElementById('admin-dashboard').style.display = 'block';
       renderAdminMembers();
+      renderAdminPotluckList();
     } else {
       alert("Code admin incorrect.");
     }
