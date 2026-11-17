@@ -283,7 +283,7 @@
     <button class="tab-btn" onclick="switchTab('admin')">⚙️ Admin</button>
   </div>
 
-  <!-- SECTION UTILISATEUR (TOUT SUR LA MÊME PAGE) -->
+  <!-- SECTION UTILISATEUR -->
   <div id="user-section" class="section active">
     <div id="login-box">
       <h3 style="margin-top:0;">Espace Participant</h3>
@@ -328,10 +328,10 @@
         </div>
       </div>
 
-      <!-- 3. BOUFFE & SOUPER -->
+      <!-- 3. BOUFFE & SOUPER (LIMITE À 1 ITEM PAR PERSONNE) -->
       <div class="card">
         <h3>🍲 Qu'est-ce qu'on apporte pour le souper ?</h3>
-        <p class="desc">Choisis un élément dans la liste de l'organisateur pour l'apporter :</p>
+        <p class="desc">Choisis un seul élément dans la liste pour l'apporter (ou annule ton choix si besoin) :</p>
         <div id="potluck-list">
           <p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucun élément dans la liste pour le moment.</p>
         </div>
@@ -481,7 +481,23 @@
       alert("Connecte-toi d'abord !");
       return;
     }
+
+    const potluck = allData.potluck || {};
+
+    // Si on veut prendre l'item, on vérifie d'abord si l'utilisateur a déjà pris un autre item
     if (take) {
+      let alreadyTaken = false;
+      Object.keys(potluck).forEach(itemId => {
+        if (potluck[itemId].bringerId === currentUser.id) {
+          alreadyTaken = true;
+        }
+      });
+
+      if (alreadyTaken) {
+        alert("⚠️ Tu as déjà choisi un élément à apporter pour le souper ! Tu ne peux en choisir qu'un seul à la fois (annule ton choix actuel si tu veux changer).");
+        return;
+      }
+
       db.ref('potluck/' + id).update({
         bringerId: currentUser.id,
         bringerName: currentUser.name
@@ -530,16 +546,34 @@
       return;
     }
 
+    // Vérifier si l'utilisateur connecté a déjà pris un item
+    let userHasChosen = false;
+    if (currentUser) {
+      Object.keys(potluck).forEach(id => {
+        if (potluck[id].bringerId === currentUser.id) {
+          userHasChosen = true;
+        }
+      });
+    }
+
     let html = '';
     keys.forEach(id => {
       const item = potluck[id];
       let actionBtn = '';
 
       if (!item.bringerId || item.bringerId === '') {
-        actionBtn = `<button onclick="assignPotluckItem('${id}', true)" class="btn-primary" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Je l'apporte 🙋‍♂️</button>`;
+        // L'item est libre
+        if (userHasChosen) {
+          // Si l'utilisateur a déjà choisi un autre item, on désactive les boutons des autres
+          actionBtn = `<span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Déjà pris un autre plat</span>`;
+        } else {
+          actionBtn = `<button onclick="assignPotluckItem('${id}', true)" class="btn-primary" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Je l'apporte 🙋‍♂️</button>`;
+        }
       } else if (currentUser && item.bringerId === currentUser.id) {
+        // C'est pris par l'utilisateur connecté (il peut annuler)
         actionBtn = `<button onclick="assignPotluckItem('${id}', false)" class="btn-primary btn-danger" style="width:auto; padding: 6px 14px; margin:0; font-size: 0.85rem; border-radius:8px;">Annuler (C'est plus moi)</button>`;
       } else {
+        // Pris par quelqu'un d'autre
         actionBtn = `<span style="color: #cbd5e1; font-size: 0.9rem; font-style: italic;">Apporté par <strong>${item.bringerName}</strong></span>`;
       }
 
