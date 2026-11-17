@@ -304,7 +304,7 @@
         
         <hr>
         
-        <h3 style="color: var(--gold-glow); margin-bottom: 8px;">💡 Liste de souhaits de ta cible</h3>
+        <h3 id="target-wishlist-title" style="color: var(--gold-glow); margin-bottom: 8px;">💡 Liste de souhaits</h3>
         <div id="target-wishlist-items">
           <p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucune idée enregistrée pour l'instant.</p>
         </div>
@@ -448,9 +448,11 @@
     if (targetId && allData.members[targetId]) {
       const target = allData.members[targetId];
       document.getElementById('target-name').innerText = target.name;
+      document.getElementById('target-wishlist-title').innerText = `💡 Liste de souhaits de ${target.name}`;
       renderTargetWishlist(target.items || {});
     } else {
       document.getElementById('target-name').innerText = "Le tirage n'a pas encore eu lieu !";
+      document.getElementById('target-wishlist-title').innerText = "💡 Liste de souhaits";
       document.getElementById('target-wishlist-items').innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">-</p>';
     }
     renderPotluck();
