@@ -40,7 +40,7 @@
     .container {
       position: relative;
       z-index: 1;
-      max-width: 600px;
+      max-width: 650px;
       width: 100%;
       background: var(--card-bg);
       backdrop-filter: blur(12px);
@@ -83,22 +83,24 @@
 
     .tabs {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       margin-bottom: 25px;
       background: rgba(0, 0, 0, 0.4);
       padding: 6px;
       border-radius: 12px;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 12px;
+      min-width: 120px;
+      padding: 10px;
       border: none;
       background: transparent;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #cbd5e1;
       transition: all 0.3s ease;
     }
@@ -187,7 +189,7 @@
       font-size: 1.1rem;
     }
 
-    .member-item, .wish-item {
+    .member-item, .wish-item, .potluck-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -196,6 +198,7 @@
       margin: 8px 0;
       border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.1);
+      gap: 10px;
     }
 
     .member-item code {
@@ -216,15 +219,38 @@
       text-decoration: none;
       font-weight: 600;
       font-size: 0.85rem;
-      max-width: 220px;
+      max-width: 200px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       transition: background 0.2s;
     }
+    .wish-link-btn:hover { background: #2563eb; }
 
-    .wish-link-btn:hover {
-      background: #2563eb;
+    /* Grille de vote */
+    .vote-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .vote-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 15px;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .vote-btn:hover { background: rgba(255, 255, 255, 0.25); border-color: var(--gold-glow); }
+    .vote-btn.selected {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-color: var(--gold-glow);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
     }
 
     hr {
@@ -251,7 +277,9 @@
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('user')">🎁 Mon Espace</button>
-    <button class="tab-btn" onclick="switchTab('admin')">⚙️ Admin / Codes</button>
+    <button class="tab-btn" onclick="switchTab('vote')">📊 Vote Budget</button>
+    <button class="tab-btn" onclick="switchTab('potluck')">🍲 Bouffe & Souper</button>
+    <button class="tab-btn" onclick="switchTab('admin')">⚙️ Admin</button>
   </div>
 
   <!-- SECTION UTILISATEUR -->
@@ -303,6 +331,45 @@
     </div>
   </div>
 
+  <!-- SECTION VOTE BUDGET -->
+  <div id="vote-section" class="section">
+    <div class="card">
+      <h3 style="margin-top:0; color: var(--gold-glow);">📊 Vote pour le Budget du Cadeau</h3>
+      <p class="desc">Choisis le montant que tu souhaites dépenser pour le Secret Santa. Le montant qui a le plus de votes l'emporte !</p>
+      
+      <div class="vote-grid">
+        <button class="vote-btn" id="vote-15" onclick="castVote(15)">15 $</button>
+        <button class="vote-btn" id="vote-25" onclick="castVote(25)">25 $</button>
+        <button class="vote-btn" id="vote-50" onclick="castVote(50)">50 $</button>
+      </div>
+
+      <hr>
+
+      <h3 style="color: var(--gold-glow);">📈 Résultats en direct :</h3>
+      <div id="vote-results" style="color: #cbd5e1; font-size: 1rem; line-height: 1.6;">
+        Chargement des votes...
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION BOUFFE & SOUPER -->
+  <div id="potluck-section" class="section">
+    <div class="card">
+      <h3 style="margin-top:0; color: var(--gold-glow);">🍲 Qu'est-ce qu'on apporte pour le souper ?</h3>
+      <p class="desc">Inscris un plat ou sélectionne ce que tu veux apporter pour que tout le monde sache quoi amener !</p>
+      
+      <div style="display:flex; gap:10px; align-items: center; margin-bottom: 15px;">
+        <input type="text" id="new-potluck-item" placeholder="Ex: Chips, Salade, Bûche, Boissons..." onkeydown="checkPotluckEnter(event)" style="margin:0;">
+        <button class="btn-primary" onclick="addPotluckItem()" style="width: auto; margin:0; padding: 12px 20px; border-radius: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Proposer</button>
+      </div>
+
+      <h4 style="color: var(--gold-glow); margin: 15px 0 8px 0;">Liste des apports :</h4>
+      <div id="potluck-list">
+        <p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucun plat inscrit pour le moment.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- SECTION ADMIN -->
   <div id="admin-section" class="section">
     <div id="admin-login">
@@ -339,25 +406,36 @@
   const db = firebase.database();
 
   let currentUser = null;
-  let allData = { members: {}, assignments: {} };
+  let allData = { members: {}, assignments: {}, votes: {}, potluck: {} };
 
   db.ref().on('value', (snapshot) => {
-    allData = snapshot.val() || { members: {}, assignments: {} };
+    allData = snapshot.val() || { members: {}, assignments: {}, votes: {}, potluck: {} };
     if (!allData.members) allData.members = {};
     if (!allData.assignments) allData.assignments = {};
+    if (!allData.votes) allData.votes = {};
+    if (!allData.potluck) allData.potluck = {};
     
     renderAdminMembers();
+    renderVotes();
+    renderPotluck();
     if (currentUser) updateUserData();
   });
 
   function switchTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    
     if (tab === 'user') {
       document.querySelectorAll('.tab-btn')[0].classList.add('active');
       document.getElementById('user-section').classList.add('active');
-    } else {
+    } else if (tab === 'vote') {
       document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      document.getElementById('vote-section').classList.add('active');
+    } else if (tab === 'potluck') {
+      document.querySelectorAll('.tab-btn')[2].classList.add('active');
+      document.getElementById('potluck-section').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab-btn')[3].classList.add('active');
       document.getElementById('admin-section').classList.add('active');
     }
   }
@@ -366,6 +444,7 @@
   function checkAdminEnter(e) { if (e.key === 'Enter') loginAdmin(); }
   function checkMemberEnter(e) { if (e.key === 'Enter') addMember(); }
   function checkWishEnter(e) { if (e.key === 'Enter') addWishItem(); }
+  function checkPotluckEnter(e) { if (e.key === 'Enter') addPotluckItem(); }
 
   function loginUser() {
     const pin = document.getElementById('pin-input').value.trim();
@@ -387,11 +466,8 @@
     if (!freshData) { logout(); return; }
     
     document.getElementById('welcome-msg').innerText = `Bonjour ${freshData.name} ! 🎄`;
-
-    // 1. Rendu de MA propre liste
     renderMyWishlist(freshData.items || {});
 
-    // 2. Rendu de la liste de MA CIBLE
     const targetId = allData.assignments ? allData.assignments[currentUser.id] : null;
     if (targetId && allData.members[targetId]) {
       const target = allData.members[targetId];
@@ -401,8 +477,125 @@
       document.getElementById('target-name').innerText = "Le tirage n'a pas encore eu lieu !";
       document.getElementById('target-wishlist-items').innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">-</p>';
     }
+    renderVotes();
   }
 
+  // --- GESTION DU VOTE ---
+  function castVote(amount) {
+    if (!currentUser) {
+      alert("Tu dois d'abord te connecter dans 'Mon Espace' pour pouvoir voter !");
+      switchTab('user');
+      return;
+    }
+    db.ref('votes/' + currentUser.id).set(amount);
+  }
+
+  function renderVotes() {
+    const votes = allData.votes || {};
+    const counts = { 15: 0, 25: 0, 50: 0 };
+    let userVotedAmount = null;
+
+    Object.keys(votes).forEach(userId => {
+      const amt = votes[userId];
+      if (counts[amt] !== undefined) counts[amt]++;
+      if (currentUser && userId === currentUser.id) {
+        userVotedAmount = amt;
+      }
+    });
+
+    // Style des boutons de vote
+    [15, 25, 50].forEach(amt => {
+      const btn = document.getElementById('vote-' + amt);
+      if (btn) {
+        if (userVotedAmount === amt) {
+          btn.classList.add('selected');
+          btn.innerText = amt + " $ (Ton vote ✅)";
+        } else {
+          btn.classList.remove('selected');
+          btn.innerText = amt + " $";
+        }
+      }
+    });
+
+    // Affichage des résultats
+    const totalVotes = Object.keys(votes).length;
+    let resultsHtml = `Total des participants ayant voté : <strong>${totalVotes}</strong><br><br>`;
+    
+    [15, 25, 50].forEach(amt => {
+      resultsHtml += `• <strong>${amt} $</strong> : ${counts[amt]} vote(s)<br>`;
+    });
+
+    // Trouver le gagnant
+    if (totalVotes > 0) {
+      let maxCount = -1;
+      let winningAmount = [];
+      Object.keys(counts).forEach(amt => {
+        if (counts[amt] > maxCount) {
+          maxCount = counts[amt];
+          winningAmount = [amt];
+        } else if (counts[amt] === maxCount && maxCount > 0) {
+          winningAmount.push(amt);
+        }
+      });
+
+      resultsHtml += `<br>🎯 <strong>Budget conseillé actuel : ${winningAmount.join(' $ ou ')} $</strong>`;
+    } else {
+      resultsHtml += `<br><em>Aucun vote enregistré pour l'instant. Sois le premier à voter !</em>`;
+    }
+
+    const resContainer = document.getElementById('vote-results');
+    if (resContainer) resContainer.innerHTML = resultsHtml;
+  }
+
+  // --- GESTION BOUFFE / SOUPER (POTLUCK) ---
+  function addPotluckItem() {
+    if (!currentUser) {
+      alert("Tu dois d'abord te connecter dans 'Mon Espace' !");
+      switchTab('user');
+      return;
+    }
+    const input = document.getElementById('new-potluck-item');
+    const dish = input.value.trim();
+    if (!dish) return;
+
+    db.ref('potluck').push({
+      dish: dish,
+      bringer: currentUser.name
+    });
+    input.value = '';
+  }
+
+  function removePotluckItem(id) {
+    db.ref('potluck/' + id).remove();
+  }
+
+  function renderPotluck() {
+    const container = document.getElementById('potluck-list');
+    const potluck = allData.potluck || {};
+    const keys = Object.keys(potluck);
+
+    if (keys.length === 0) {
+      container.innerHTML = '<p style="color: #cbd5e1; font-style: italic; margin: 0;">Aucun plat inscrit pour le moment.</p>';
+      return;
+    }
+
+    let html = '';
+    keys.forEach(id => {
+      const item = potluck[id];
+      html += `
+        <div class="potluck-item">
+          <div>
+            <strong style="color:#fff; font-size: 1.05rem;">🍴 ${item.dish}</strong>
+            <br><span style="color: var(--gold-glow); font-size: 0.9rem;">Apporté par : <strong>${item.bringer}</strong></span>
+          </div>
+          ${currentUser && item.bringer === currentUser.name ? `<button onclick="removePotluckItem('${id}')" class="btn-primary btn-danger" style="width:auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-radius:6px;">Retirer</button>` : ''}
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  // --- WISHLIST ---
   function addWishItem() {
     if (!currentUser) return;
     const nameInput = document.getElementById('item-name');
@@ -486,8 +679,10 @@
     document.getElementById('login-box').style.display = 'block';
     document.getElementById('user-dashboard').style.display = 'none';
     document.getElementById('pin-input').value = '';
+    renderVotes();
   }
 
+  // --- ADMIN ---
   function loginAdmin() {
     const pin = document.getElementById('admin-pin').value.trim();
     if (pin === '999' || pin === '9999') {
